@@ -4,11 +4,10 @@ FROM ubnginx:latest
 LABEL description="Aplicación React con Node.js"
 
 # Instalar Node.js y npm
-RUN apt-get update && apt-get install -y \
-    nodejs \
-    npm \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl ca-certificates \
+ && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+ && apt-get install -y nodejs build-essential \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Crear directorio de la aplicación
 WORKDIR /app
