@@ -1,4 +1,6 @@
+
 services:
+  # 1. UBBASE - Imagen base Ubuntu
   ubbase:
     build:
       context: .
@@ -8,6 +10,7 @@ services:
     networks:
       - hlc_network
 
+  # 2. UBSECURITY - Capa de seguridad con SSH
   ubsecurity:
     build:
       context: .
@@ -17,10 +20,11 @@ services:
     depends_on:
       - ubbase
     ports:
-      - "5724:5724"
+      - "5724:5724"  # SSH
     networks:
       - hlc_network
 
+  # 3. UBSGBD - Base de datos PostgreSQL
   ubsgbd:
     build:
       context: .
@@ -30,19 +34,45 @@ services:
     depends_on:
       - ubsecurity
     ports:
-      - "5432:5432"
+      - "5432:5432"  # PostgreSQL
+      - "5725:5724"  # SSH de BD
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin123
+      - POSTGRES_DB=hlcdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - hlc_network
 
+  # 4. UBNGINX - Servidor web Nginx
+  ubnginx:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.ubnginx
+    image: ubnginx:latest
+    container_name: hlc_ubnginx
+    depends_on:
+      - ubsecurity
+
+    ports:
+      - "80:80"      # HTTP
+      - "5726:5724"  # SSH de Nginx
+    networks:
+      - hlc_network
+
+  # 5. UBREACT - Aplicación React con PokeAPI
   ubreact:
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile.ubreact
     image: ubreact:latest
     container_name: hlc_ubreact
+    depends_on:
+      - ubnginx
     ports:
-      - "3000:3000"
-      - "5727:5724"
+      - "3000:3000"  # React Dev Server
+      - "5727:5724"  # SSH de React
     environment:
       - NODE_ENV=development
       - REACT_APP_API_URL=https://pokeapi.co/api/v2
