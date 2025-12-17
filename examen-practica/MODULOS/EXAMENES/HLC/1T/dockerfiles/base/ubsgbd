@@ -1,6 +1,38 @@
 # Dockerfile.ubsgbd - Base de datos PostgreSQL sobre ubsecurity
 FROM ubsecurity:latest
 
+# Instalar PostgreSQL
+RUN apt-get update && apt-get install -y \
+    postgresql \
+    postgresql-contrib \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Configurar PostgreSQL
+USER postgres
+RUN /etc/init.d/postgresql start && \
+    psql --command "CREATE USER admin WITH SUPERUSER PASSWORD 'admin123';" && \
+    createdb -O admin hlcdb
+
+USER root
+
+# Configurar acceso remoto (detectar versión de Postgres y usarla)
+RUN set -eux; \
+    PGVER=$(ls -1 /etc/postgresql | head -n1); \
+    test -d /etc/postgresql/$PGVER/main || mkdir -p /etc/postgresql/$PGVER/main; \
+    echo "host all all 0.0.0.0/0 md5" >> /etc/postgresql/$PGVER/main/pg_hba.conf; \
+    echo "listen_addresses='*'" >> /etc/postgresql/$PGVER/main/postgresql.conf
+
+EXPOSE 5432 5724
+
+# Script de inicio
+RUN echo '#!/bin/bash\nservice postgresql start\nservice ssh start\ntail -f /dev/null' > /start-db.sh && \
+    chmod +x /start-db.sh
+
+CMD ["/start-db.sh"]
+# Dockerfile.ubsgbd - Base de datos PostgreSQL sobre ubsecurity
+FROM ubsecurity:latest
+
 LABEL maintainer="dangelo@hlc.com"
 LABEL description="Servidor de base de datos PostgreSQL"
 
