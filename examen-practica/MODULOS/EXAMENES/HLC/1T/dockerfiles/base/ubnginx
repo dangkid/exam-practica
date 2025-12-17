@@ -6,19 +6,23 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Configurar Nginx
+    # Configuración para servir una SPA estática desde /var/www/html
 RUN echo 'server {\n\
     listen 80;\n\
-    server_name localhost;\n\
-    \n\
+    server_name _;\n\
+\n\
+    root /var/www/html;\n\
+    index index.html;\n\
+\n\
     location / {\n\
-        proxy_pass http://ubreact:3000;\n\
-        proxy_http_version 1.1;\n\
-        proxy_set_header Upgrade $http_upgrade;\n\
-        proxy_set_header Connection "upgrade";\n\
-        proxy_set_header Host $host;\n\
-        proxy_cache_bypass $http_upgrade;\n\
+        try_files $uri /index.html;\n\
     }\n\
+\n\
+    location ~* \\\.(?:css|js|jpg|jpeg|gif|png|svg|ico|ttf|woff|woff2)$ {\n\
+        expires 1y;\n\
+        add_header Cache-Control "public, immutable";\n\
+    }\n\
+\n\
 }' > /etc/nginx/sites-available/default
 
 EXPOSE 80 5724

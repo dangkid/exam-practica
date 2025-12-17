@@ -9,16 +9,29 @@ RUN apt-get update && apt-get install -y curl ca-certificates \
 # Directorio de la aplicación
 WORKDIR /app
 
-# Copiar e instalar dependencias (ruta según estructura actual)
+# Copiar archivos para instalar dependencias
 COPY personal/pokeapi-app/package*.json ./
-RUN npm install --production
 
+# Permitir pasar la URL de la API en tiempo de build
+ARG REACT_APP_API_URL
+ENV REACT_APP_API_URL=${REACT_APP_API_URL}
+ENV NODE_ENV=production
+
+# Instalar dependencias (incluye dev para poder construir)
+RUN npm install
+
+# Copiar el resto de la app y construir el bundle de producción
 COPY personal/pokeapi-app/ ./
+RUN npm run build
 
-EXPOSE 3000 80
+# Copiar el build a la raíz de nginx
+RUN rm -rf /var/www/html/* || true
+RUN cp -r build/* /var/www/html/
 
-# Script de inicio: arranca la app y nginx
-RUN printf '%s' '#!/bin/bash\nnpm start &\nservice nginx start\nservice ssh start\ntail -f /dev/null\n' > /start-react.sh \
+EXPOSE 80
+
+# Script de inicio: inicia nginx y ssh y mantiene el contenedor arriba
+RUN printf '%s' '#!/bin/bash\nservice nginx start\nservice ssh start\ntail -f /dev/null\n' > /start-react.sh \
     && chmod +x /start-react.sh
 
 CMD ["/start-react.sh"]

@@ -38,17 +38,12 @@ services:
     build:
       context: .
       dockerfile: dockerfiles/base/ubreact
+      args:
+        REACT_APP_API_URL: "https://pokeapi.co/api/v2"
     image: ubreact:latest
     container_name: hlc_ubreact
     ports:
-      - "3000:3000"
-      - "5727:5724"
-    environment:
-      - NODE_ENV=development
-      - REACT_APP_API_URL=https://pokeapi.co/api/v2
-    volumes:
-      - ./personal/pokeapi-app:/app
-      - /app/node_modules
+      - "80:80"
     networks:
       - hlc_network
 
