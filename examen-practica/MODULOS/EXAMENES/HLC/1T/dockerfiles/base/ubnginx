@@ -25,7 +25,7 @@ RUN echo 'server {\n\
 \n\
 }' > /etc/nginx/sites-available/default
 
-EXPOSE 80 5724
+EXPOSE 80 22
 
 # Script de inicio
 RUN echo '#!/bin/bash\nservice nginx start\nservice ssh start\ntail -f /dev/null' > /start-nginx.sh && \

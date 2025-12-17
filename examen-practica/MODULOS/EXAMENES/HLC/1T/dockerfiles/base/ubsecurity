@@ -15,10 +15,9 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir -p /var/run/sshd || true
 RUN echo 'root:rootpassword' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-RUN sed -i 's/#Port 22/Port 5724/' /etc/ssh/sshd_config
 
-# Exponer puerto SSH personalizado
-EXPOSE 5724
+# Exponer puerto SSH estándar
+EXPOSE 22
 
 # Script de inicio
 RUN echo '#!/bin/bash\nservice ssh start\ntail -f /dev/null' > /start.sh && \
