@@ -1,0 +1,55 @@
+services:
+  # Servicio SSH/Seguridad
+  ssh:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.ssh
+    image: hlc_ssh:latest
+    container_name: hlc_ssh
+    ports:
+      - "2222:22"
+    networks:
+      - hlc_network
+
+  # Servicio PostgreSQL
+  db:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.db
+    image: hlc_db:latest
+    container_name: hlc_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: hlcdb
+    ports:
+      - "5432:5432"
+    networks:
+      - hlc_network
+    volumes:
+      - postgres_data:/var/lib/postgresql/14/main
+
+  # Servicio Web (Nginx + React)
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.web
+      args:
+        REACT_APP_API_URL: "https://pokeapi.co/api/v2"
+    image: hlc_web:latest
+    container_name: hlc_web
+    ports:
+      - "80:80"
+    networks:
+      - hlc_network
+    depends_on:
+      - db
+
+networks:
+  hlc_network:
+    driver: bridge
+    name: hlc_examen_network
+
+volumes:
+  postgres_data:
+    name: hlc_postgres_data

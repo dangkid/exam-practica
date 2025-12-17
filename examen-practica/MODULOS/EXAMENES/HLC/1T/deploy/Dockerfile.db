@@ -1,12 +1,11 @@
-# Dockerfile.ubsgbd - Base de datos PostgreSQL sobre ubsecurity
-FROM ubsecurity:latest
+# Servicio PostgreSQL
+FROM ubuntu:22.04
 
-# Evitar prompts durante apt (tzdata, locales, etc.) y fijar zona horaria por defecto
 ENV DEBIAN_FRONTEND=noninteractive
 ARG TZ=Europe/Madrid
 ENV TZ=${TZ}
 
-# Instalar PostgreSQL (no interactivo)
+# Instalar PostgreSQL
 RUN apt-get update && apt-get install -y --no-install-recommends \
     tzdata \
     postgresql \
@@ -22,17 +21,17 @@ RUN /etc/init.d/postgresql start && \
 
 USER root
 
-# Configurar acceso remoto (detectar versión de Postgres y usarla)
+# Configurar acceso remoto
 RUN set -eux; \
     PGVER=$(ls -1 /etc/postgresql | head -n1); \
     test -d /etc/postgresql/$PGVER/main || mkdir -p /etc/postgresql/$PGVER/main; \
     echo "host all all 0.0.0.0/0 md5" >> /etc/postgresql/$PGVER/main/pg_hba.conf; \
     echo "listen_addresses='*'" >> /etc/postgresql/$PGVER/main/postgresql.conf
 
-EXPOSE 5432 22
+EXPOSE 5432
 
 # Script de inicio
-RUN echo '#!/bin/bash\nservice postgresql start\nservice ssh start\ntail -f /dev/null' > /start-db.sh && \
-    chmod +x /start-db.sh
+RUN echo '#!/bin/bash\nservice postgresql start\ntail -f /dev/null' > /start.sh && \
+    chmod +x /start.sh
 
-CMD ["/start-db.sh"]
+CMD ["/start.sh"]

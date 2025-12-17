@@ -1,0 +1,61 @@
+# Servicio Web - Nginx + React
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ARG TZ=Europe/Madrid
+ENV TZ=${TZ}
+
+# Instalar Nginx y Node.js
+RUN apt-get update && apt-get install -y \
+    nginx \
+    curl \
+    ca-certificates \
+    build-essential \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Configuración de Nginx para SPA
+RUN echo 'server {\n\
+    listen 80;\n\
+    server_name _;\n\
+\n\
+    root /var/www/html;\n\
+    index index.html;\n\
+\n\
+    location / {\n\
+        try_files $uri /index.html;\n\
+    }\n\
+\n\
+    location ~* \\\.(?:css|js|jpg|jpeg|gif|png|svg|ico|ttf|woff|woff2)$ {\n\
+        expires 1y;\n\
+        add_header Cache-Control "public, immutable";\n\
+    }\n\
+}' > /etc/nginx/sites-available/default
+
+# Build de la aplicación React
+WORKDIR /app
+
+COPY personal/pokeapi-app/package*.json ./
+
+ARG REACT_APP_API_URL=https://pokeapi.co/api/v2
+ENV REACT_APP_API_URL=${REACT_APP_API_URL}
+ENV NODE_ENV=production
+
+RUN npm install
+
+COPY personal/pokeapi-app/ ./
+RUN npm run build
+
+# Copiar build a nginx
+RUN rm -rf /var/www/html/* || true
+RUN cp -r build/* /var/www/html/
+
+EXPOSE 80
+
+# Script de inicio
+RUN echo '#!/bin/bash\nservice nginx start\ntail -f /dev/null' > /start.sh && \
+    chmod +x /start.sh
+
+CMD ["/start.sh"]
