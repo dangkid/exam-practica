@@ -30,8 +30,5 @@ RUN cp -r build/* /var/www/html/
 
 EXPOSE 80
 
-# Script de inicio: inicia nginx y ssh y mantiene el contenedor arriba
-RUN printf '%s' '#!/bin/bash\nservice nginx start\nservice ssh start\ntail -f /dev/null\n' > /start-react.sh \
-    && chmod +x /start-react.sh
-
-CMD ["/start-react.sh"]
+# Arrancar nginx y ssh en primer plano y mantener el contenedor arriba
+CMD ["/bin/bash", "-c", "service nginx start && service ssh start && tail -f /dev/null"]
