@@ -1,8 +1,14 @@
 # Dockerfile.ubsgbd - Base de datos PostgreSQL sobre ubsecurity
 FROM ubsecurity:latest
 
-# Instalar PostgreSQL
-RUN apt-get update && apt-get install -y \
+# Evitar prompts durante apt (tzdata, locales, etc.) y fijar zona horaria por defecto
+ENV DEBIAN_FRONTEND=noninteractive
+ARG TZ=Europe/Madrid
+ENV TZ=${TZ}
+
+# Instalar PostgreSQL (no interactivo)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    tzdata \
     postgresql \
     postgresql-contrib \
     && apt-get clean \
