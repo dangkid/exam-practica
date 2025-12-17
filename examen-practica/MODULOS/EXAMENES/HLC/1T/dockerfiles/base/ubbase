@@ -1,0 +1,22 @@
+# Capa Base - Ubuntu con herramientas esenciales
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ARG TZ=Europe/Madrid
+ENV TZ=${TZ}
+
+# Instalar herramientas básicas
+RUN apt-get update && apt-get install -y \
+    nano \
+    curl \
+    wget \
+    git \
+    net-tools \
+    iputils-ping \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Directorio de trabajo
+WORKDIR /root
+
+CMD ["/bin/bash"]

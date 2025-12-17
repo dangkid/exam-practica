@@ -1,0 +1,82 @@
+services:
+  # Capa 1: Base
+  ubbase:
+    build:
+      context: .
+      dockerfile: dockerfiles/base/ubbase
+    image: ubbase:latest
+    container_name: hlc_ubbase
+    networks:
+      - hlc_network
+
+  # Capa 2: Seguridad (sobre ubbase)
+  ubsecurity:
+    build:
+      context: .
+      dockerfile: dockerfiles/base/ubsecurity
+    image: ubsecurity:latest
+    container_name: hlc_ubsecurity
+    ports:
+      - "2222:22"
+    networks:
+      - hlc_network
+    depends_on:
+      - ubbase
+
+  # Capa 3a: Base de datos (sobre ubsecurity)
+  ubsgbd:
+    build:
+      context: .
+      dockerfile: dockerfiles/base/ubsgbd
+    image: ubsgbd:latest
+    container_name: hlc_ubsgbd
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: hlcdb
+    ports:
+      - "5432:5432"
+    networks:
+      - hlc_network
+    volumes:
+      - postgres_data:/var/lib/postgresql/14/main
+    depends_on:
+      - ubsecurity
+
+  # Capa 3b: Nginx (sobre ubsecurity)
+  ubnginx:
+    build:
+      context: .
+      dockerfile: dockerfiles/base/ubnginx
+    image: ubnginx:latest
+    container_name: hlc_ubnginx
+    networks:
+      - hlc_network
+    depends_on:
+      - ubsecurity
+
+  # Capa 4: React App (sobre ubnginx)
+  ubreact:
+    build:
+      context: .
+      dockerfile: dockerfiles/base/ubreact
+      args:
+        REACT_APP_API_URL: "https://pokeapi.co/api/v2"
+    image: ubreact:latest
+    container_name: hlc_ubreact
+    ports:
+      - "80:80"
+    networks:
+      - hlc_network
+    depends_on:
+      - ubnginx
+      - ubsgbd
+
+networks:
+  hlc_network:
+    driver: bridge
+    name: hlc_examen_network
+
+volumes:
+  postgres_data:
+    name: hlc_postgres_data

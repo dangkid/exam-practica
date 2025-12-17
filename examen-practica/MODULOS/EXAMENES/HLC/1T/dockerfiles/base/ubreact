@@ -1,0 +1,37 @@
+# Capa React - Aplicación PokeAPI sobre ubnginx
+FROM ubnginx:latest
+
+# Instalar Node.js v18
+RUN apt-get update && apt-get install -y curl ca-certificates \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs build-essential \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Directorio de aplicación
+WORKDIR /app
+
+# Copiar package.json
+COPY personal/pokeapi-app/package*.json ./
+
+# Variables de entorno
+ARG REACT_APP_API_URL=https://pokeapi.co/api/v2
+ENV REACT_APP_API_URL=${REACT_APP_API_URL}
+ENV NODE_ENV=production
+
+# Instalar dependencias
+RUN npm install
+
+# Copiar código fuente
+COPY personal/pokeapi-app/ ./
+
+# Build de React
+RUN npm run build
+
+# Copiar build a Nginx
+RUN rm -rf /var/www/html/* || true
+RUN cp -r build/* /var/www/html/
+
+EXPOSE 80 22
+
+# Usar script de nginx
+CMD ["/start-nginx.sh"]

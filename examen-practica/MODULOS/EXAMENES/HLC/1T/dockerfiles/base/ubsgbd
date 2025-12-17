@@ -1,5 +1,5 @@
-# Servicio PostgreSQL
-FROM ubuntu:22.04
+# Capa Base de Datos - PostgreSQL sobre ubsecurity
+FROM ubsecurity:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 ARG TZ=Europe/Madrid
@@ -24,14 +24,13 @@ USER root
 # Configurar acceso remoto
 RUN set -eux; \
     PGVER=$(ls -1 /etc/postgresql | head -n1); \
-    test -d /etc/postgresql/$PGVER/main || mkdir -p /etc/postgresql/$PGVER/main; \
     echo "host all all 0.0.0.0/0 md5" >> /etc/postgresql/$PGVER/main/pg_hba.conf; \
     echo "listen_addresses='*'" >> /etc/postgresql/$PGVER/main/postgresql.conf
 
-EXPOSE 5432
+EXPOSE 5432 22
 
 # Script de inicio
-RUN echo '#!/bin/bash\nservice postgresql start\ntail -f /dev/null' > /start.sh && \
-    chmod +x /start.sh
+RUN echo '#!/bin/bash\nservice postgresql start\nservice ssh start\ntail -f /dev/null' > /start-db.sh && \
+    chmod +x /start-db.sh
 
-CMD ["/start.sh"]
+CMD ["/start-db.sh"]
