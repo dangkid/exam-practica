@@ -1,27 +1,24 @@
-# Dockerfile.ubreact - Aplicación React sobre ubnginx
 FROM ubnginx:latest
 
-LABEL description="Aplicación React con Node.js"
-
-# Instalar Node.js y npm
+# Instalar Node.js (v18) y herramientas de compilación
 RUN apt-get update && apt-get install -y curl ca-certificates \
  && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
  && apt-get install -y nodejs build-essential \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Crear directorio de la aplicación
+# Directorio de la aplicación
 WORKDIR /app
 
-# Copiar aplicación
-COPY pokeapi-app/package*.json ./
-RUN npm install
+# Copiar e instalar dependencias (ruta según estructura actual)
+COPY personal/pokeapi-app/package*.json ./
+RUN npm install --production
 
-COPY pokeapi-app/ .
+COPY personal/pokeapi-app/ ./
 
-EXPOSE 3000 80 5724
+EXPOSE 3000 80
 
-# Script de inicio
-RUN echo '#!/bin/bash\nnpm start &\nservice nginx start\nservice ssh start\ntail -f /dev/null' > /start-react.sh && \
-    chmod +x /start-react.sh
+# Script de inicio: arranca la app y nginx
+RUN printf '%s' '#!/bin/bash\nnpm start &\nservice nginx start\nservice ssh start\ntail -f /dev/null\n' > /start-react.sh \
+    && chmod +x /start-react.sh
 
 CMD ["/start-react.sh"]
