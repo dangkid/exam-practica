@@ -1,11 +1,14 @@
-FROM ubuntu
+ARG UBUNTU_VERSION=22.04
+FROM ubuntu:${UBUNTU_VERSION}
 
-RUN apt update && apt install -yq --no-install-recommends \
-     nano \
-     git curl wget \
-     iputils-ping net-tools \
-     sudo \
-     openssh-server \
+LABEL maintainer="dangelo@hlc.com"
+
+RUN apt update && apt install -yq --no-install-recommends \\
+     nano \\
+     git curl wget \\
+     iputils-ping net-tools \\
+     sudo \\
+     openssh-server \\
      ca-certificates
 
 # copiar los scripts del entrypoint

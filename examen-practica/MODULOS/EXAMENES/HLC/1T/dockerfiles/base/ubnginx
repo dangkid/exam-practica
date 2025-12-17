@@ -1,6 +1,7 @@
 # Dockerfile.ubnginx - Servidor web Nginx sobre ubsecurity
 FROM ubsecurity:latest
 
+LABEL maintainer="dangelo@hlc.com"
 LABEL description="Servidor web Nginx"
 
 # Instalar Nginx

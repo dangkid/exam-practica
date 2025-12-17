@@ -1,6 +1,7 @@
 # Dockerfile.ubsecurity - Capa de seguridad sobre ubbase
 FROM ubbase:latest
 
+LABEL maintainer="dangelo@hlc.com"
 LABEL description="Capa de seguridad con SSH y configuraciones seguras"
 
 # Instalar openssh-server y herramientas de seguridad

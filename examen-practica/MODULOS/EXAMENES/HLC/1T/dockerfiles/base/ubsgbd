@@ -1,6 +1,7 @@
 # Dockerfile.ubsgbd - Base de datos PostgreSQL sobre ubsecurity
 FROM ubsecurity:latest
 
+LABEL maintainer="dangelo@hlc.com"
 LABEL description="Servidor de base de datos PostgreSQL"
 
 # Instalar PostgreSQL

@@ -1,0 +1,11 @@
+.DS_Store
+node_modules/
+*.log
+.env
+docker-compose.override.yml
+docker-compose.yml.bak
+HLC-25-26/
+*.pem
+*.key
+.vscode/
+__pycache__/
