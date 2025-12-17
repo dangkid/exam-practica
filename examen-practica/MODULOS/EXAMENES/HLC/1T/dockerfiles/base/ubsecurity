@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Configurar SSH
-RUN mkdir /var/run/sshd
+# Usar -p para no fallar si ya existe (evita error en builds repetidos)
+RUN mkdir -p /var/run/sshd || true
 RUN echo 'root:rootpassword' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 RUN sed -i 's/#Port 22/Port 5724/' /etc/ssh/sshd_config
