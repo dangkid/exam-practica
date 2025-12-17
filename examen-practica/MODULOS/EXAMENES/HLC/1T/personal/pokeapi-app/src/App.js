@@ -50,8 +50,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>🎮 PokéAPI - HLC Examen Final</h1>
-        <p>Arquitectura Docker en Capas: ubbase → ubsecurity → ubnginx → ubreact</p>
+        <h1>Pokédex - Examen HLC Docker</h1>
+        <p>Arquitectura: SSH + PostgreSQL + Nginx + React</p>
       </header>
 
       <div className="search-container">
@@ -130,8 +130,8 @@ function App() {
       )}
 
       <footer className="App-footer">
-        <p>Puerto 3000 (React) → Puerto 80 (Nginx) → Base de datos Puerto 5432 (PostgreSQL)</p>
-        <p>SSH disponible en puerto 5724</p>
+        <p>Servicios: Web (80) | PostgreSQL (5432) | SSH (2222)</p>
+        <p>Examen HLC - Docker Compose</p>
       </footer>
     </div>
   );
