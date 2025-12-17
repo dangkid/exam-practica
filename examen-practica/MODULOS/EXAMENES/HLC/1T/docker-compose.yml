@@ -17,7 +17,7 @@ services:
     depends_on:
       - ubbase
     ports:
-      - "22:22"
+      - "2222:22"
     networks:
       - hlc_network
 
