@@ -81,7 +81,7 @@ function App() {
                   className="pokemon-image"
                 />
                 <h3>#{pokemon.id}</h3>
-                <h2>{pokemon.name.toUpperCase()}</h2>
+                <h2>{pokemon.name}</h2>
                 <div className="pokemon-types">
                   {pokemon.types.map((type) => (
                     <span key={type.type.name} className={`type ${type.type.name}`}>
@@ -97,7 +97,7 @@ function App() {
             <div className="modal" onClick={() => setSelectedPokemon(null)}>
               <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <span className="close" onClick={() => setSelectedPokemon(null)}>&times;</span>
-                <h2>#{selectedPokemon.id} - {selectedPokemon.name.toUpperCase()}</h2>
+                <h2>#{selectedPokemon.id} - {selectedPokemon.name}</h2>
                 <img
                   src={selectedPokemon.sprites.other['official-artwork'].front_default}
                   alt={selectedPokemon.name}
